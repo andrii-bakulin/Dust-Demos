@@ -18,13 +18,15 @@ namespace Dust.DustEditor
         protected DuProperty m_SpawnPointsIterate;
         protected DuProperty m_SpawnPointsSeed;
 
+        protected DuProperty m_SphereVolumeRadius;
+        protected DuProperty m_BoxVolumeSize;
+
         protected DuProperty m_MultipleSpawnEnabled;
         protected DuProperty m_MultipleSpawnCount;
         protected DuProperty m_MultipleSpawnSeed;
 
         protected DuProperty m_ActivateInstance;
         protected DuProperty m_ParentMode;
-        protected DuProperty m_ResetPosition;
         protected DuProperty m_ResetRotation;
         protected DuProperty m_ResetScale;
 
@@ -32,7 +34,7 @@ namespace Dust.DustEditor
 
         static SpawnActionEditor()
         {
-            ActionsPopupButtons.AddActionTransform(typeof(SpawnAction), "Spawn");
+            ActionsPopupButtons.AddActionGameObject(typeof(SpawnAction), "Spawn");
         }
 
         [MenuItem("Dust/Actions/Spawn")]
@@ -57,13 +59,15 @@ namespace Dust.DustEditor
             m_SpawnPointsIterate = FindProperty("m_SpawnPointsIterate", "Spawn Points Iterate");
             m_SpawnPointsSeed = FindProperty("m_SpawnPointsSeed", "Seed");
 
+            m_SphereVolumeRadius = FindProperty("m_SphereVolumeRadius", "Volume Radius");
+            m_BoxVolumeSize = FindProperty("m_BoxVolumeSize", "Volume Size");
+
             m_MultipleSpawnEnabled = FindProperty("m_MultipleSpawnEnabled", "Enabled");
             m_MultipleSpawnCount = FindProperty("m_MultipleSpawnCount", "Spawn Count");
             m_MultipleSpawnSeed = FindProperty("m_MultipleSpawnSeed", "Seed");
 
             m_ActivateInstance = FindProperty("m_ActivateInstance", "Activate Instance", "If TRUE, all new GameObjects will be forcibly set to active.");
             m_ParentMode = FindProperty("m_ParentMode", "Assign Parent As");
-            m_ResetPosition = FindProperty("m_ResetPosition", "Reset Position");
             m_ResetRotation = FindProperty("m_ResetRotation", "Reset Rotation");
             m_ResetScale = FindProperty("m_ResetScale", "Reset Scale");
         }
@@ -78,6 +82,8 @@ namespace Dust.DustEditor
 
             PropertyField(m_SpawnObjects);
                 
+            Space();
+
             if (m_SpawnObjects.property.arraySize > 1)
             {
                 PropertyField(m_SpawnObjectsIterate);
@@ -111,6 +117,16 @@ namespace Dust.DustEditor
                     }
                     break;
 
+                case SpawnAction.SpawnPointMode.SphereVolume:
+                    PropertyExtendedSlider(m_SphereVolumeRadius, 0f, 5f, 0.01f, 0f);
+                    PropertySeedRandomOrFixed(m_SpawnPointsSeed);
+                    break;
+
+                case SpawnAction.SpawnPointMode.BoxVolume:
+                    PropertyField(m_BoxVolumeSize);
+                    PropertySeedRandomOrFixed(m_SpawnPointsSeed);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -140,7 +156,6 @@ namespace Dust.DustEditor
 
                 Space();
 
-                PropertyField(m_ResetPosition);
                 PropertyField(m_ResetRotation);
                 PropertyField(m_ResetScale);
 
@@ -155,6 +170,12 @@ namespace Dust.DustEditor
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Validate & Normalize Data
+
+            if (m_SphereVolumeRadius.isChanged)
+                m_SphereVolumeRadius.valFloat = SpawnAction.NormalizeSphereVolumeRadius(m_SphereVolumeRadius.valFloat);
+
+            if (m_BoxVolumeSize.isChanged)
+                m_BoxVolumeSize.valVector3 = SpawnAction.NormalizeBoxVolumeSize(m_BoxVolumeSize.valVector3);
 
             // @notice: no need to NormalizeMultipleSpawnCount for m_MultipleSpawnCount.
             // It auto-normalized in PropertyFieldRange() method

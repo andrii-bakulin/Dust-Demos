@@ -14,9 +14,9 @@ namespace Dust.DustEditor
             AddEntity("Actions.Animate", type, title);
         }
 
-        public static void AddActionFlow(System.Type type, string title)
+        public static void AddActionGameObject(System.Type type, string title)
         {
-            AddEntity("Actions.Flow", type, title);
+            AddEntity("Actions.GameObject", type, title);
         }
 
         public static void AddActionTransform(System.Type type, string title)
@@ -42,8 +42,8 @@ namespace Dust.DustEditor
             popup.m_Action = action;
 
             GenerateColumn(popup, "Actions.Animate", "Animate");
-            GenerateColumn(popup, "Actions.Flow", "Flow");
             GenerateColumn(popup, "Actions.Physics", "Physics");
+            GenerateColumn(popup, "Actions.GameObject", "GameObject");
             GenerateColumn(popup, "Actions.Transform", "Transform");
             GenerateColumn(popup, "Actions.Others", "Others");
 
